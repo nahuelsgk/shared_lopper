@@ -1,8 +1,10 @@
+import 'rc-slider/assets/index.css';
 import React, { Component } from 'react';
 import  {Grid, Row, Col} from 'react-bootstrap';
 import logo from './logo.svg';
 import './App.css';
 import keydown from 'react-keydown';
+import Slider from 'rc-slider';
 
 @keydown
 class App extends Component {
@@ -13,7 +15,8 @@ class App extends Component {
         }
     }
 
-    componentWillReceiveProps( { keydown } ) {
+    componentWillReceiveProps( nextProps ) {
+        const keydown = nextProps.keydown
         if ( keydown.event ) {
             // inspect the keydown event and decide what to do
             if (keydown.event.key === '1') {
@@ -38,13 +41,13 @@ class App extends Component {
                 <div className="App-intro">
                     <Grid>
                         <Row className="show-grid">
-                            <Col xs={2} md={2}>
+                            <Col xs={4} md={4}>
                                 <Pad ref={ component => this.componentPad1 = component} keyTrigger="1" />
                             </Col>
-                            <Col xs={2} md={2}>
+                            <Col xs={4} md={4}>
                                 <Pad ref={ component => this.componentPad2 = component} keyTrigger="2" />
                             </Col>
-                            <Col xs={2} md={2}>
+                            <Col xs={4} md={4}>
                                 <Pad ref={ component => this.componentPad3 = component} keyTrigger="3" />
                             </Col>
                         </Row>
@@ -62,14 +65,21 @@ class Pad extends React.Component {
         this.state = {
             audio_src: '',
             audio_component: '',
-            key_trigger: props.keyTrigger
+            key_trigger: props.keyTrigger,
+            volume: 100
         }
     }
 
     play () {
         if (this.state.audio_src) {
             if (this.audio_component.paused) {
-                this.audio_component.play()
+                var playPromise = this.audio_component.play()
+                if (playPromise !== undefined) {
+                    playPromise.then(function () {
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                }
             } else {
                 this.audio_component.currentTime = 0;
             }
@@ -78,21 +88,29 @@ class Pad extends React.Component {
 
     updateAudioSrc( e ) {
         const selectedFile = e.target.files[0];
-        console.log('Selected File', selectedFile);
+        //console.log('Selected File', selectedFile);
 
         var reader = new FileReader();
-        reader.onload = function (e) {
+        reader.onloadend = function (e) {
             this.setState({audio_src: e.target.result});
         }.bind(this)
         reader.readAsDataURL(selectedFile)
     }
 
+    updateVolume( props ) {
+        this.audio_component.volume = props / 100
+    }
+
     render() {
         return (
             <div>
-                <audio ref={component => this.audio_component = component} src={this.state.audio_src} />
-                <button onClick={this.play.bind(this)}> {this.state.key_trigger}</button>
-                <input type="file" name="input" onChange={this.updateAudioSrc.bind(this)}/>
+                <audio
+                    ref={component => this.audio_component = component}
+                    src={this.state.audio_src}
+                />
+                <button className="butt" onClick={this.play.bind(this)}> {this.state.key_trigger}</button>
+                <Slider min={0} max={100} defaultValue={75} onChange={this.updateVolume.bind(this)}/>
+                <input className="inputfile" type="file" name="input" onChange={this.updateAudioSrc.bind(this)}/>
             </div>
         )
     }
