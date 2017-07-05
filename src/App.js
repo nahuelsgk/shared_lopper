@@ -14,6 +14,8 @@ class App extends Component {
             componentPad1: '',
             componentPad2: '',
             componentPad3: '',
+            audio_files: [],
+            selected_audio_file: ''
         }
     }
 
@@ -33,7 +35,26 @@ class App extends Component {
         }
     }
 
+    componentWillMount() {
+        fetch('http://localhost:9000/App/audiofileslist')
+            .then( response => response.json())
+            .then( ({files: items}) => {
+                this.setState({audio_files: items})
+            });
+    }
+
+    audioFileSelected( e ) {
+        const audio_file = e.target.getAttribute('name')
+        this.setState({selected_audio_file: audio_file})
+    }
+
+    assignAudioByClick( e ) {
+        console.log("Asignar selected audio a este pad " + this.state.selected_audio_file)
+    }
     render() {
+        let audio_files = this.state.audio_files
+        let select_audio_file = this.state.selected_audio_file
+        console.log(select_audio_file)
         return (
             <div className="App">
                 <div className="App-header">
@@ -43,22 +64,35 @@ class App extends Component {
                 <div className="App-intro">
                     <Grid>
                         <Row className="show-grid">
-                            <Col xs={4} md={4}>
+                            <Col xs={3} md={3}>
+                                <ul>
+                                    {audio_files.map(
+                                        item =>
+                                            <li
+                                                id={item}
+                                                key={item}
+                                                name={item}
+                                                onClick={this.audioFileSelected.bind(this)}
+                                            >{item}</li>)}
+                                </ul>
+                            </Col>
+                            <Col xs={3} md={3}>
                                 <Pad
                                     ref={ component => this.componentPad1 = component}
                                     keyTrigger="1"
                                 />
                             </Col>
-                            <Col xs={4} md={4}>
+                            <Col xs={3} md={3}>
                                 <Pad
                                     ref={ component => this.componentPad2 = component}
                                     keyTrigger="2"
                                 />
                             </Col>
-                            <Col xs={4} md={4}>
+                            <Col xs={3} md={3}>
                                 <Pad
                                     ref={ component => this.componentPad3 = component}
                                     keyTrigger="3"
+                                    onClick={this.assignAudioByClick(select_audio_file)}
                                 />
                             </Col>
                         </Row>
@@ -69,6 +103,6 @@ class App extends Component {
     }
 }
 
-
+//const AudioFile = (props) => <li>{props.file}</li>
 
 export default App;

@@ -49,9 +49,10 @@ class Pad extends React.Component {
         this.audio_component.volume = props / 100
     }
 
+    
     render() {
         return (
-            <div>
+            <div className="PadItem" onClick={this.props.onClick}>
                 <div>
                     <span>{this.state.file_name}</span>
                 </div>
@@ -68,6 +69,10 @@ class Pad extends React.Component {
             </div>
         )
     }
+}
+
+Pad.defaultProps = {
+    onClick: function () {}
 }
 
 export default Pad;
