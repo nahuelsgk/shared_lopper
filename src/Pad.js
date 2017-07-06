@@ -9,11 +9,21 @@ class Pad extends React.Component {
             audio_component: '',
             key_trigger: props.keyTrigger,
             volume: 100,
-            file_name: 'None audio selected'
+            file_name: 'None audio selected',
+            audio_files: [],
         }
     }
 
+    componentWillMount() {
+        fetch('http://localhost:9000/App/audiofileslist')
+            .then( response => response.json())
+            .then( ({files: items}) => {
+                this.setState({audio_files: items})
+            });
+    }
+
     play () {
+        console.log("PAD.js Playing :(" + this.state.audio_src + ")");
         if (this.state.audio_src) {
             if (this.audio_component.paused) {
                 var playPromise = this.audio_component.play()
@@ -49,8 +59,12 @@ class Pad extends React.Component {
         this.audio_component.volume = props / 100
     }
 
+    componentWillReceiveProps () {
+
+    }
     
     render() {
+        let audio_files = this.state.audio_files
         return (
             <div className="PadItem" onClick={this.props.onClick}>
                 <div>
@@ -65,6 +79,16 @@ class Pad extends React.Component {
                 </div>
 
                 <Slider min={0} max={100} defaultValue={75} onChange={this.updateVolume.bind(this)}/>
+
+                <ul>
+                    {audio_files.map(
+                        item =>
+                            <li
+                                id={item}
+                                key={item}
+                                name={item}
+                            >{item}</li>)}
+                </ul>
                 <input className="inputfile" type="file" name="input" onChange={this.updateAudioSrc.bind(this)}/>
             </div>
         )
@@ -72,7 +96,6 @@ class Pad extends React.Component {
 }
 
 Pad.defaultProps = {
-    onClick: function () {}
 }
 
 export default Pad;
