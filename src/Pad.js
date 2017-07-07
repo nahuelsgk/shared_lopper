@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
 import Slider from 'rc-slider';
+import RaisedButton from 'material-ui/RaisedButton';
+import MenuItem from 'material-ui/MenuItem';
+import Menu from 'material-ui/Menu';
+import Popover from 'material-ui/Popover';
 
 class Pad extends React.Component {
     constructor(props){
@@ -10,20 +14,28 @@ class Pad extends React.Component {
             key_trigger: props.keyTrigger,
             volume: 100,
             file_name: 'None audio selected',
-            audio_files: [],
+            kick_audio_files: [],
+            snare_audio_files: [],
+            kicks_menu_open: false,
+            snares_menu_open: false
         }
     }
 
     componentWillMount() {
-        fetch('http://localhost:9000/App/audiofileslist')
+        fetch('http://localhost:9000/api/kicks')
             .then( response => response.json())
-            .then( ({files: items}) => {
-                this.setState({audio_files: items})
+            .then( items_kicks  => {
+                this.setState({kick_audio_files: items_kicks})
+            });
+
+        fetch('http://localhost:9000/api/snares')
+            .then( response => response.json())
+            .then( items => {
+                this.setState({snare_audio_files: items})
             });
     }
 
     play () {
-        console.log("PAD.js Playing :(" + this.state.audio_src + ")");
         if (this.state.audio_src) {
             if (this.audio_component.paused) {
                 var playPromise = this.audio_component.play()
@@ -59,12 +71,53 @@ class Pad extends React.Component {
         this.audio_component.volume = props / 100
     }
 
-    componentWillReceiveProps () {
-
+    updateAudioSrcFromMenuList( object, value ) {
+        this.setState(
+            {
+                file_name: object.target.innerText,
+                audio_src: value
+            }
+        )
+        this.handleRequestClose()
+        this.handleSnaresRequestClose()
     }
-    
+
+    handleTouchTap = (event) => {
+        // This prevents ghost click.
+        event.preventDefault();
+
+        this.setState({
+            kicks_menu_open: true,
+            anchorEl: event.currentTarget,
+        });
+    };
+
+    handleSnaresTouchTap = (event) => {
+        // This prevents ghost click.
+        event.preventDefault();
+
+        this.setState({
+            snares_menu_open: true,
+            anchorEl: event.currentTarget,
+        });
+    };
+
+    handleRequestClose = () => {
+        this.setState({
+            kicks_menu_open: false,
+        });
+    };
+
+    handleSnaresRequestClose = () => {
+        this.setState({
+            snares_menu_open: false,
+        });
+    };
+
     render() {
-        let audio_files = this.state.audio_files
+        let kick_audio_files   = this.state.kick_audio_files
+        let snares_audio_files = this.state.snare_audio_files
+
         return (
             <div className="PadItem" onClick={this.props.onClick}>
                 <div>
@@ -75,21 +128,68 @@ class Pad extends React.Component {
                         ref={component => this.audio_component = component}
                         src={this.state.audio_src}
                     />
-                    <button className="butt" onClick={this.play.bind(this)}> {this.state.key_trigger}</button>
+                    <RaisedButton label={this.state.key_trigger} onTouchTap={this.play.bind(this)}/>
+                </div>
+                <div>
+                    <Slider min={0} max={100} defaultValue={75} onChange={this.updateVolume.bind(this)}/>
+                </div>
+                <div>
+                    <div>
+                        {/* KICKS */}
+                        <RaisedButton
+                            onTouchTap={this.handleTouchTap}
+                            label="Kicks"
+                        />
+                        <Popover
+                            open={this.state.kicks_menu_open}
+                            anchorEl={this.state.anchorEl}
+                            anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+                            targetOrigin={{horizontal: 'left', vertical: 'top'}}
+                            onRequestClose={this.handleRequestClose}
+                        >
+                            <Menu onChange={this.updateAudioSrcFromMenuList.bind(this)}>
+                                {kick_audio_files.map(
+                                    item =>
+                                        <MenuItem
+                                            id={item.Name}
+                                            key={item.Name}
+                                            value={item.Url}
+                                            primaryText={item.Name}
+                                        />)}
+                            </Menu>
+                        </Popover>
+                    </div>
+
+                    {/* SNARES */}
+                    <div>
+                        <RaisedButton
+                            onTouchTap={this.handleSnaresTouchTap}
+                            label="Snares"
+                        />
+                        <Popover
+                            open={this.state.snares_menu_open}
+                            anchorEl={this.state.anchorEl}
+                            anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+                            targetOrigin={{horizontal: 'left', vertical: 'top'}}
+                            onRequestClose={this.handleSnaresRequestClose}
+                        >
+                            <Menu onChange={this.updateAudioSrcFromMenuList.bind(this)}>
+                                {snares_audio_files.map(
+                                    item =>
+                                        <MenuItem
+                                            id={item.Name}
+                                            key={item.Name}
+                                            value={item.Url}
+                                            primaryText={item.Name}
+                                        />)}
+                            </Menu>
+                        </Popover>
+                    </div>
+                </div>
+                <div>
+                    <input className="inputfile" type="file" name="input" onChange={this.updateAudioSrc.bind(this)}/>
                 </div>
 
-                <Slider min={0} max={100} defaultValue={75} onChange={this.updateVolume.bind(this)}/>
-
-                <ul>
-                    {audio_files.map(
-                        item =>
-                            <li
-                                id={item}
-                                key={item}
-                                name={item}
-                            >{item}</li>)}
-                </ul>
-                <input className="inputfile" type="file" name="input" onChange={this.updateAudioSrc.bind(this)}/>
             </div>
         )
     }
