@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import Slider from 'rc-slider';
 import RaisedButton from 'material-ui/RaisedButton';
-import MenuItem from 'material-ui/MenuItem';
-import Menu from 'material-ui/Menu';
-import Popover from 'material-ui/Popover';
+import AudioSelect from './AudioSelector'
 
 class Pad extends React.Component {
     constructor(props){
@@ -17,7 +15,8 @@ class Pad extends React.Component {
             kick_audio_files: [],
             snare_audio_files: [],
             kicks_menu_open: false,
-            snares_menu_open: false
+            snares_menu_open: false,
+            hihats_menu_open: false
         }
     }
 
@@ -32,6 +31,12 @@ class Pad extends React.Component {
             .then( response => response.json())
             .then( items => {
                 this.setState({snare_audio_files: items})
+            });
+
+        fetch('http://localhost:9000/api/hihats')
+            .then( response => response.json())
+            .then( items => {
+                this.setState({hihats_audio_files: items})
             });
     }
 
@@ -71,52 +76,19 @@ class Pad extends React.Component {
         this.audio_component.volume = props / 100
     }
 
-    updateAudioSrcFromMenuList( object, value ) {
+    updateAudioSelect(object, value) {
         this.setState(
             {
                 file_name: object.target.innerText,
                 audio_src: value
             }
-        )
-        this.handleRequestClose()
-        this.handleSnaresRequestClose()
+        );
     }
-
-    handleTouchTap = (event) => {
-        // This prevents ghost click.
-        event.preventDefault();
-
-        this.setState({
-            kicks_menu_open: true,
-            anchorEl: event.currentTarget,
-        });
-    };
-
-    handleSnaresTouchTap = (event) => {
-        // This prevents ghost click.
-        event.preventDefault();
-
-        this.setState({
-            snares_menu_open: true,
-            anchorEl: event.currentTarget,
-        });
-    };
-
-    handleRequestClose = () => {
-        this.setState({
-            kicks_menu_open: false,
-        });
-    };
-
-    handleSnaresRequestClose = () => {
-        this.setState({
-            snares_menu_open: false,
-        });
-    };
 
     render() {
         let kick_audio_files   = this.state.kick_audio_files
         let snares_audio_files = this.state.snare_audio_files
+        let hihat_audio_files  = this.state.hihats_audio_files
 
         return (
             <div className="PadItem" onClick={this.props.onClick}>
@@ -134,57 +106,24 @@ class Pad extends React.Component {
                     <Slider min={0} max={100} defaultValue={75} onChange={this.updateVolume.bind(this)}/>
                 </div>
                 <div>
-                    <div>
-                        {/* KICKS */}
-                        <RaisedButton
-                            onTouchTap={this.handleTouchTap}
-                            label="Kicks"
-                        />
-                        <Popover
-                            open={this.state.kicks_menu_open}
-                            anchorEl={this.state.anchorEl}
-                            anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-                            targetOrigin={{horizontal: 'left', vertical: 'top'}}
-                            onRequestClose={this.handleRequestClose}
-                        >
-                            <Menu onChange={this.updateAudioSrcFromMenuList.bind(this)}>
-                                {kick_audio_files.map(
-                                    item =>
-                                        <MenuItem
-                                            id={item.Name}
-                                            key={item.Name}
-                                            value={item.Url}
-                                            primaryText={item.Name}
-                                        />)}
-                            </Menu>
-                        </Popover>
-                    </div>
-
+                    {/* KICKS */}
+                    <AudioSelect
+                        label="KICKS"
+                        audiofiles={kick_audio_files}
+                        onSelectHandler={this.updateAudioSelect.bind(this)}
+                    />
                     {/* SNARES */}
-                    <div>
-                        <RaisedButton
-                            onTouchTap={this.handleSnaresTouchTap}
-                            label="Snares"
-                        />
-                        <Popover
-                            open={this.state.snares_menu_open}
-                            anchorEl={this.state.anchorEl}
-                            anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-                            targetOrigin={{horizontal: 'left', vertical: 'top'}}
-                            onRequestClose={this.handleSnaresRequestClose}
-                        >
-                            <Menu onChange={this.updateAudioSrcFromMenuList.bind(this)}>
-                                {snares_audio_files.map(
-                                    item =>
-                                        <MenuItem
-                                            id={item.Name}
-                                            key={item.Name}
-                                            value={item.Url}
-                                            primaryText={item.Name}
-                                        />)}
-                            </Menu>
-                        </Popover>
-                    </div>
+                    <AudioSelect
+                        label="SNARES"
+                        audiofiles={snares_audio_files}
+                        onSelectHandler={this.updateAudioSelect.bind(this)}
+                    />
+                    {/* HIHATS */}
+                    <AudioSelect
+                        label="HIHATS"
+                        audiofiles={hihat_audio_files}
+                        onSelectHandler={this.updateAudioSelect.bind(this)}
+                    />
                 </div>
                 <div>
                     <input className="inputfile" type="file" name="input" onChange={this.updateAudioSrc.bind(this)}/>
@@ -193,9 +132,6 @@ class Pad extends React.Component {
             </div>
         )
     }
-}
-
-Pad.defaultProps = {
 }
 
 export default Pad;
