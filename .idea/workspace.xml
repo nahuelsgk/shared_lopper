@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d216dbf7-9f8c-48a0-9cc6-8031a3c19e0f" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Pad.js" afterPath="$PROJECT_DIR$/src/Pad.js" />
     </list>
     <ignored path="audio-looper.iws" />
@@ -44,8 +43,8 @@
       <file leaf-file-name="Pad.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Pad.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1840">
-              <caret line="80" column="13" selection-start-line="80" selection-start-column="13" selection-end-line="80" selection-end-column="13" />
+            <state relative-caret-position="-1661">
+              <caret line="15" column="34" selection-start-line="15" selection-start-column="34" selection-end-line="15" selection-end-column="34" />
               <folding>
                 <element signature="e#0#41#0" expanded="true" />
               </folding>
@@ -245,12 +244,12 @@
       <workItem from="1499265392653" duration="2031000" />
       <workItem from="1499323192774" duration="6853000" />
       <workItem from="1499340688569" duration="10497000" />
-      <workItem from="1499422697546" duration="6215000" />
+      <workItem from="1499422697546" duration="7264000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="67013000" />
+    <option name="totallyTimeSpent" value="68062000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="26" width="2548" height="1338" extended-state="0" />
@@ -730,8 +729,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Pad.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1840">
-          <caret line="80" column="13" selection-start-line="80" selection-start-column="13" selection-end-line="80" selection-end-column="13" />
+        <state relative-caret-position="-1661">
+          <caret line="15" column="34" selection-start-line="15" selection-start-column="34" selection-end-line="15" selection-end-column="34" />
           <folding>
             <element signature="e#0#41#0" expanded="true" />
           </folding>
