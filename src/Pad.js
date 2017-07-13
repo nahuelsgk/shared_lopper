@@ -18,19 +18,19 @@ class Pad extends React.Component {
     }
 
     componentWillMount() {
-        fetch('http://localhost:9000/api/sounds/808/kicks')
+        fetch(process.env.REACT_APP_PUBLIC_API + '/api/sounds/808/kicks')
             .then( response => response.json())
             .then( items_kicks  => {
                 this.setState({kick_audio_files: items_kicks})
             });
 
-        fetch('http://localhost:9000/api/sounds/808/snares')
+        fetch(process.env.REACT_APP_PUBLIC_API + '/api/sounds/808/snares')
             .then( response => response.json())
             .then( items => {
                 this.setState({snare_audio_files: items})
             });
 
-        fetch('http://localhost:9000/api/sounds/808/hihats')
+        fetch(process.env.REACT_APP_PUBLIC_API + '/api/sounds/808/hihats')
             .then( response => response.json())
             .then( items => {
                 this.setState({hihats_audio_files: items})
