@@ -1,12 +1,15 @@
-import React from 'react';
-import logo from './logo.svg';
-import keydown from 'react-keydown';
-import  {Grid, Row, Col} from 'react-bootstrap';
-import Pad from './Pad.js';
-import './App.css';
-import 'rc-slider/assets/index.css';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import injectTapEventPlugin from 'react-tap-event-plugin';
+import {Grid, Row, Col} from 'react-bootstrap';
+import MenuItem from 'material-ui/MenuItem'
+import AppBar from 'material-ui/AppBar'
+import Drawer from 'material-ui/Drawer'
+import keydown from 'react-keydown';
+import 'rc-slider/assets/index.css';
+import Pad from './Pad.js';
+import React from 'react';
+import './App.css';
+
 injectTapEventPlugin();
 
 @keydown
@@ -14,18 +17,29 @@ class App extends React.Component {
     constructor() {
         super();
 
+        var componentMap = this.initMapComponent();
+
         this.state = {
             componentPad1: '',
             componentPad2: '',
             componentPad3: '',
+            componentPad4: '',
             audio_files: [],
             selected_audio_file: '',
             audio_src1: '',
             audio_src2: '',
-            audio_src3: ''
+            audio_src3: '',
+            audio_src4: '',
+            componentsMap: componentMap
         }
 
 
+    }
+
+    initMapComponent() {
+        var mapComponent = new Map();
+        mapComponent.set("4", {keyTrigger: 4});
+        return mapComponent;
     }
 
     componentWillReceiveProps( nextProps ) {
@@ -41,6 +55,9 @@ class App extends React.Component {
             if (keydown.event.key === '3') {
                 this.componentPad3.play();
             }
+            if (keydown.event.key === '4') {
+                this.componentPad4.play();
+            }
         }
     }
 
@@ -48,9 +65,22 @@ class App extends React.Component {
         return (
             <MuiThemeProvider>
                 <div className="App">
-                    <div className="App-header">
-                      <img src={logo} className="App-logo" alt="logo" />
-                      <h2>Welcome to React</h2>
+                    <div>
+                        <AppBar
+                            title="Sound looper"
+                            style={{margin:20}}
+                            onLeftIconButtonTouchTap={ e => this.setState({drawerOpen: !this.state.drawerOpen})}
+                        />
+                        <Drawer
+                            open={this.state.drawerOpen}
+                            onRequestChange={open => this.setState({drawerOpen: open})}
+                            docked={false}
+                        >
+                            <MenuItem
+                                onTouchTap={e => this.setState({drawerOpen: false})}
+                                value={'/'} primaryText="Home"
+                            />
+                        </Drawer>
                     </div>
                     <div className="App-intro">
                         <Grid>

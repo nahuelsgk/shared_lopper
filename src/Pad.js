@@ -39,7 +39,7 @@ class Pad extends React.Component {
 
     play () {
         if (this.state.audio_src) {
-            if (this.audio_component.paused) {
+            if (this.audio_component.paused || this.audio_component.ended || this.audio_component.currentTime === 0 ) {
                 var playPromise = this.audio_component.play()
                 if (playPromise !== undefined) {
                     playPromise.then(function () {

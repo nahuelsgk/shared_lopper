@@ -20,7 +20,6 @@ class AudioSelector extends React.Component {
     }
 
     handleTouchPad = (event) => {
-        console.log("Abriendo")
         this.setState(
             {
                 open: true,
