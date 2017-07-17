@@ -37,6 +37,7 @@ class AudioSelector extends React.Component {
 
     customSelectHandler(object, value)
     {
+        console.log("Se selecciona un objecto");
         this.props.onSelectHandler(object, value);
         this.setState(
             {
