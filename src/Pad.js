@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Slider from 'rc-slider';
 import RaisedButton from 'material-ui/RaisedButton';
 import AudioSelect from './AudioSelector'
+import FileInput from 'react-file-input';
 
 class Pad extends React.Component {
     constructor(props){
@@ -123,7 +124,12 @@ class Pad extends React.Component {
                     />
                 </div>
                 <div>
-                    <input className="inputfile" type="file" name="input" onChange={this.updateAudioSrc.bind(this)}/>
+                    <FileInput
+                        name="My Audio file"
+                        accept=".wav,.mp3"
+                        placeholder="Custom audio"
+                        onChange={this.updateAudioSrc.bind(this)}
+                    />
                 </div>
 
             </div>
