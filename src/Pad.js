@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import Slider from 'rc-slider';
 import RaisedButton from 'material-ui/RaisedButton';
 import AudioSelect from './AudioSelector'
-import FileInput from 'react-file-input';
 
 class Pad extends React.Component {
     constructor(props){
@@ -18,8 +17,13 @@ class Pad extends React.Component {
         }
     }
 
+    componentWillReceiveProps(nextProps) {
+        console.log({audio_src: nextProps.audioSrc, file_name: nextProps.audioFileName});
+        this.setState({audio_src: nextProps.audioSrc, file_name: nextProps.audioFileName})
+    }
+
     componentWillMount() {
-        fetch(process.env.REACT_APP_PUBLIC_API + '/api/sounds/808/kicks')
+        /*fetch(process.env.REACT_APP_PUBLIC_API + '/api/sounds/808/kicks')
             .then( response => response.json())
             .then( items_kicks  => {
                 this.setState({kick_audio_files: items_kicks})
@@ -35,7 +39,7 @@ class Pad extends React.Component {
             .then( response => response.json())
             .then( items => {
                 this.setState({hihats_audio_files: items})
-            });
+            });*/
     }
 
     play () {
@@ -105,33 +109,24 @@ class Pad extends React.Component {
                 </div>
                 <div>
                     {/* KICKS */}
-                    <AudioSelect
+                    {/*<AudioSelect
                         label="KICKS"
                         audiofiles={kick_audio_files}
                         onSelectHandler={this.updateAudioSelect.bind(this)}
-                    />
+                    />*/}
                     {/* SNARES */}
-                    <AudioSelect
+                    {/*<AudioSelect
                         label="SNARES"
                         audiofiles={snares_audio_files}
                         onSelectHandler={this.updateAudioSelect.bind(this)}
-                    />
+                    />*/}
                     {/* HIHATS */}
-                    <AudioSelect
+                    {/*<AudioSelect
                         label="HIHATS"
                         audiofiles={hihat_audio_files}
                         onSelectHandler={this.updateAudioSelect.bind(this)}
-                    />
+                    />*/}
                 </div>
-                <div>
-                    <FileInput
-                        name="My Audio file"
-                        accept=".wav,.mp3"
-                        placeholder="Custom audio"
-                        onChange={this.updateAudioSrc.bind(this)}
-                    />
-                </div>
-
             </div>
         )
     }
