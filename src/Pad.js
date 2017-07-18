@@ -18,7 +18,6 @@ class Pad extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        console.log({audio_src: nextProps.audioSrc, file_name: nextProps.audioFileName});
         this.setState({audio_src: nextProps.audioSrc, file_name: nextProps.audioFileName})
     }
 
@@ -45,10 +44,8 @@ class Pad extends React.Component {
     play () {
         if (this.state.audio_src) {
             if (this.audio_component.paused || this.audio_component.ended || this.audio_component.currentTime === 0 ) {
-                console.log("Playing function")
                 this.audio_component.play()
                     .then(function(){
-                        console.log("Playing promise!")
                     })
                     .catch(function(error) {
                         console.log(error)

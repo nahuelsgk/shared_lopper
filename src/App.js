@@ -36,8 +36,6 @@ class App extends React.Component {
     constructor() {
         super();
 
-        var componentMap = this.initMapComponent();
-
         this.state = {
             componentPad1: '',
             componentPad2: '',
@@ -47,10 +45,21 @@ class App extends React.Component {
             file_name_src1: '',
             audio_src2: '',
             audio_src3: '',
-            componentsMap: componentMap,
             kick_audio_files: [],
-            selected_component: false
+            snares_audio_files: [],
+            hihats_audio_files: [],
+            selected_component: false,
+            selected_slot: '',
+            component_map: this.initComponentMap()
         }
+    }
+
+    initComponentMap()  {
+        var map = new Map();
+        map.set(1, {src: '', name: ''});
+        map.set(2, {src: '', name: ''});
+        map.set(3, {src: '', name: ''});
+        return map;
     }
 
     componentWillMount() {
@@ -61,12 +70,20 @@ class App extends React.Component {
                     this.setState({kick_audio_files: items_kicks})
                 }
             )
-    }
-
-    initMapComponent() {
-        var mapComponent = new Map();
-        mapComponent.set("4", {keyTrigger: 4});
-        return mapComponent;
+        fetch(process.env.REACT_APP_PUBLIC_API + '/api/sounds/808/snares')
+            .then(response => response.json())
+            .then(
+                items_snares => {
+                    this.setState({snares_audio_files: items_snares})
+                }
+            )
+        fetch(process.env.REACT_APP_PUBLIC_API + '/api/sounds/808/hihats')
+            .then(response => response.json())
+            .then(
+                items_hihats=> {
+                    this.setState({hihats_audio_files: items_hihats})
+                }
+            )
     }
 
     componentWillReceiveProps( nextProps ) {
@@ -82,20 +99,19 @@ class App extends React.Component {
             if (keydown.event.key === '3') {
                 this.componentPad3.play();
             }
-            if (keydown.event.key === '4') {
-                this.componentPad4.play();
-            }
         }
     }
 
     handlerAudioSelection(url, name) {
-        if (this.state.selected_component !== undefined) {
+        if (this.state.selected_slot !== '') {
+            var component_map = this.state.component_map;
+            component_map.set(this.state.selected_slot, {src: url, name: name});
             this.setState(
                 {
                     component_selected:false,
+                    selected_slot: '',
                     drawerOpen: false,
-                    file_name_src1: name,
-                    audio_src1: url
+                    component_map: component_map
                 }
             );
         } else {
@@ -103,15 +119,16 @@ class App extends React.Component {
         }
     }
 
-    updateCustomAudioSrc( e ) {
+    updateCustomAudioSrc( slot, e ) {
         const selectedFile = e.target.files[0];
         if (selectedFile !== undefined) {
             var reader = new FileReader();
             reader.onloadend = function (e) {
+                var component_map = this.state.component_map;
+                component_map.set(slot, {src: e.target.result, name: selectedFile.name});
                 this.setState(
                     {
-                        file_name_src1: selectedFile.name,
-                        audio_src1: e.target.result
+                        component_map: component_map
                     }
                 );
             }.bind(this)
@@ -121,6 +138,8 @@ class App extends React.Component {
 
     render() {
         let audio_kick_files = this.state.kick_audio_files
+        let audio_snares_files = this.state.snares_audio_files
+        let audio_hihats_files = this.state.hihats_audio_files
         return (
             <MuiThemeProvider>
                 <div className="App">
@@ -155,6 +174,36 @@ class App extends React.Component {
                                             />
                                         )}
                                 />
+                                <ListItem
+                                    primaryText="Snares"
+                                    initiallyOpen={false}
+                                    primaryTogglesNestedList={true}
+                                    nestedItems={
+                                        audio_snares_files.map(
+                                            item =>
+                                            <ListItem
+                                                key={item.Name}
+                                                primaryText={item.Name}
+                                                value={item.Url}
+                                                onTouchTap={this.handlerAudioSelection.bind(this, item.Url, item.Name)}
+                                            />
+                                        )}
+                                />
+                                <ListItem
+                                    primaryText="Hihats"
+                                    initiallyOpen={false}
+                                    primaryTogglesNestedList={true}
+                                    nestedItems={
+                                        audio_hihats_files.map(
+                                            item =>
+                                            <ListItem
+                                                key={item.Name}
+                                                primaryText={item.Name}
+                                                value={item.Url}
+                                                onTouchTap={this.handlerAudioSelection.bind(this, item.Url, item.Name)}
+                                            />
+                                        )}
+                                />
                             </List>
                         </Drawer>
                     </div>
@@ -165,8 +214,8 @@ class App extends React.Component {
                                     <Pad
                                         ref={ component => this.componentPad1 = component}
                                         keyTrigger="1"
-                                        audioSrc={this.state.audio_src1}
-                                        audioFileName={this.state.file_name_src1}
+                                        audioSrc={this.state.component_map.get(1).src}
+                                        audioFileName={this.state.component_map.get(1).name}
                                     />
                                     <FlatButton
                                         label="Choose a sound"
@@ -175,7 +224,13 @@ class App extends React.Component {
                                         containerElement="label"
                                         onTouchTap={
                                             e => {
-                                                this.setState({drawerOpen: true, selected_component: true});
+                                                this.setState(
+                                                    {
+                                                        drawerOpen: true,
+                                                        selected_component: true,
+                                                        selected_slot: 1,
+                                                    }
+                                                );
                                             }
                                          }
                                     />
@@ -183,23 +238,71 @@ class App extends React.Component {
                                         name="My Audio file"
                                         accept=".wav,.mp3"
                                         placeholder="Custom audio"
-                                        onChange={this.updateCustomAudioSrc.bind(this)}
+                                        onChange={this.updateCustomAudioSrc.bind(this, 1)}
                                     />
                                 </Col>
                                 <Col xs={4} md={4}>
                                     <Pad
                                         ref={ component => this.componentPad2 = component}
                                         keyTrigger="2"
-                                        audio_src={this.audio_src2}
+                                        audioSrc={this.state.component_map.get(2).src}
+                                        audioFileName={this.state.component_map.get(2).name}
+                                    />
+                                    <FlatButton
+                                        label="Choose a sound"
+                                        labelPosition="before"
+                                        style={styles.uploadButton}
+                                        containerElement="label"
+                                        onTouchTap={
+                                            e => {
+                                                this.setState(
+                                                    {
+                                                        drawerOpen: true,
+                                                        selected_component: true,
+                                                        selected_slot: 2,
+                                                    }
+                                                );
+                                            }
+                                         }
+                                    />
+                                    <FileInput
+                                        name="My Audio file"
+                                        accept=".wav,.mp3"
+                                        placeholder="Custom audio"
+                                        onChange={this.updateCustomAudioSrc.bind(this, 1)}
                                     />
                                 </Col>
-                                {/*<Col xs={4} md={4}>
+                                <Col xs={4} md={4}>
                                     <Pad
                                         ref={ component => this.componentPad3 = component}
                                         keyTrigger="3"
-                                        audioSrc={this.audio_src3}
+                                        audioSrc={this.state.component_map.get(3).src}
+                                        audioFileName={this.state.component_map.get(3).name}
                                     />
-                                </Col>*/}
+                                    <FlatButton
+                                        label="Choose a sound"
+                                        labelPosition="before"
+                                        style={styles.uploadButton}
+                                        containerElement="label"
+                                        onTouchTap={
+                                            e => {
+                                                this.setState(
+                                                    {
+                                                        drawerOpen: true,
+                                                        selected_component: true,
+                                                        selected_slot: 3,
+                                                    }
+                                                );
+                                            }
+                                         }
+                                    />
+                                    <FileInput
+                                        name="My Audio file"
+                                        accept=".wav,.mp3"
+                                        placeholder="Custom audio"
+                                        onChange={this.updateCustomAudioSrc.bind(this, 1)}
+                                    />
+                                </Col>*
                             </Row>
                         </Grid>
                     </div>
