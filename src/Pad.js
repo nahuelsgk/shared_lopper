@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Slider from 'rc-slider';
 import RaisedButton from 'material-ui/RaisedButton';
-import AudioSelect from './AudioSelector'
+//import AudioSelect from './AudioSelector'
 
 class Pad extends React.Component {
     constructor(props){
@@ -86,10 +86,6 @@ class Pad extends React.Component {
     }
 
     render() {
-        let kick_audio_files   = this.state.kick_audio_files
-        let snares_audio_files = this.state.snare_audio_files
-        let hihat_audio_files  = this.state.hihats_audio_files
-
         return (
             <div className="PadItem" onClick={this.props.onClick}>
                 <div>
