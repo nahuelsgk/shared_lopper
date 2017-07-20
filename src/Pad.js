@@ -89,7 +89,9 @@ class Pad extends React.Component {
         return (
             <div className="PadItem" onClick={this.props.onClick}>
                 <div>
-                    <span>{this.state.file_name}</span>
+                    <AudioNameDisplay
+                        fileName={this.state.file_name}
+                    />
                 </div>
                 <div>
                     <audio
@@ -123,6 +125,14 @@ class Pad extends React.Component {
                 </div>
             </div>
         )
+    }
+}
+
+const AudioNameDisplay = (props) => {
+    if (props.fileName != '') {
+        return <span>{props.fileName}</span>
+    } else {
+        return <span>No audio selected</span>
     }
 }
 

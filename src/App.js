@@ -3,13 +3,13 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 import MenuItem from 'material-ui/MenuItem'
 import AppBar from 'material-ui/AppBar'
 import Drawer from 'material-ui/Drawer'
-
+import SignUpForm from './components/SignUpForm'
 import 'rc-slider/assets/index.css';
 import React from 'react';
 import './App.css';
 
 import {BrowserRouter as Router, Link, Route} from 'react-router-dom';
-import MainBoard from './MainBoard'
+import MainBoard from './components/MainBoard'
 injectTapEventPlugin();
 
 class App extends React.Component {
@@ -43,7 +43,7 @@ class App extends React.Component {
                                         primaryText="Home"
                                     />
                                 </Link>
-                                <Link to={'/login'}>
+                                <Link to={'/signup'}>
                                     <MenuItem
                                         onTouchTap={e => this.setState({drawerOpen: false})}
                                         primaryText="Login"
@@ -52,7 +52,7 @@ class App extends React.Component {
                             </Drawer>
                         </div>
                         <Route path="/home" component={MainBoard} />
-                        <Route path="/login" component={Login} />
+                        <Route path="/signup" component={SignUpFormInit} />
                     </div>
                 </MuiThemeProvider>
             </Router>
@@ -60,6 +60,13 @@ class App extends React.Component {
     }
 }
 
-const Login = () => {return <div>Login Dashboard</div>}
+const SignUpFormInit = () => {
+    return <SignUpForm
+        onSubmit={(e) => console.log('submitted')}
+        onChange={(e) => console.log('changed')}
+        errors={{ email: 'Invalid' }}
+        user={{ email: 'jane@doe.com', name: 'Jane Doe' }}
+    />
+}
 
 export default App;

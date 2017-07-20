@@ -35,3 +35,21 @@
   background-color: blue;
   color:white;
 }
+
+.container {
+  margin: 0 auto;
+  text-align: center;
+}
+
+.card-heading {
+  padding: 16px;
+}
+
+.field-line, .button-line {
+  padding: 16px;
+}
+
+.error-message {
+  padding: 0 16px;
+  color: tomato;
+}

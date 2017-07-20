@@ -1,9 +1,8 @@
 import React from 'react';
-import Pad from './Pad.js';
-import Drawer from 'material-ui/Drawer'
+import Pad from './../Pad.js';
+import {Drawer, FlatButton} from 'material-ui'
 import {Grid, Row, Col} from 'react-bootstrap';
 import {List, ListItem} from 'material-ui/List';
-import FlatButton from 'material-ui/FlatButton';
 import FileInput from 'react-file-input';
 import keydown from 'react-keydown';
 
@@ -113,8 +112,9 @@ class MainBoard extends React.Component
         }
     }
 
-    updateCustomAudioSrc( slot, e ) {
+    updateCustomAudioSrcMenu( e ) {
         const selectedFile = e.target.files[0];
+        const slot = this.state.selected_slot;
         if (selectedFile !== undefined) {
             var reader = new FileReader();
             reader.onloadend = function (e) {
@@ -122,6 +122,9 @@ class MainBoard extends React.Component
                 component_map.set(slot, {src: e.target.result, name: selectedFile.name});
                 this.setState(
                     {
+                        component_selected:false,
+                        selected_slot: '',
+                        audioDrawerOpen: false,
                         component_map: component_map
                     }
                 );
@@ -188,6 +191,12 @@ class MainBoard extends React.Component
                                                 />
                                             )}
                         />
+                        <FileInput
+                            name="My Audio file"
+                            accept=".wav,.mp3"
+                            placeholder="Custom audio"
+                            onChange={this.updateCustomAudioSrcMenu.bind(this)}
+                        />
                     </List>
                 </Drawer>
                 <Grid>
@@ -216,12 +225,6 @@ class MainBoard extends React.Component
                                                     }
                                                  }
                             />
-                            <FileInput
-                                name="My Audio file"
-                                accept=".wav,.mp3"
-                                placeholder="Custom audio"
-                                onChange={this.updateCustomAudioSrc.bind(this, 1)}
-                            />
                         </Col>
                         <Col xs={4} md={4}>
                             <Pad
@@ -247,12 +250,6 @@ class MainBoard extends React.Component
                                                     }
                                                  }
                             />
-                            <FileInput
-                                name="My Audio file"
-                                accept=".wav,.mp3"
-                                placeholder="Custom audio"
-                                onChange={this.updateCustomAudioSrc.bind(this, 1)}
-                            />
                         </Col>
                         <Col xs={4} md={4}>
                             <Pad
@@ -277,12 +274,6 @@ class MainBoard extends React.Component
                                                         );
                                                     }
                                                  }
-                            />
-                            <FileInput
-                                name="My Audio file"
-                                accept=".wav,.mp3"
-                                placeholder="Custom audio"
-                                onChange={this.updateCustomAudioSrc.bind(this, 1)}
                             />
                         </Col>
                     </Row>
