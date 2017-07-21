@@ -129,7 +129,7 @@ class Pad extends React.Component {
 }
 
 const AudioNameDisplay = (props) => {
-    if (props.fileName != '') {
+    if (props.fileName !== '') {
         return <span>{props.fileName}</span>
     } else {
         return <span>No audio selected</span>

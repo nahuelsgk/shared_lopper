@@ -43,7 +43,8 @@ class MainBoard extends React.Component
             selected_component: false,
             selected_slot: '',
             component_map: this.initComponentMap(),
-            audioDrawerOpen: false
+            audioDrawerOpen: false,
+            timeout_preview: function() {}
         }
     }
 
@@ -133,6 +134,15 @@ class MainBoard extends React.Component
         }
     }
 
+    handleAutoPreview(url) {
+        var timeout = setTimeout(function () {
+            new Audio(url).play();
+        }, 1000);
+
+        this.setState({timeout_preview: timeout})
+    }
+
+
     render () {
         let audio_kick_files = this.state.kick_audio_files
         let audio_snares_files = this.state.snares_audio_files
@@ -158,6 +168,8 @@ class MainBoard extends React.Component
                                                     primaryText={item.Name}
                                                     value={item.Url}
                                                     onTouchTap={this.handlerAudioSelection.bind(this, item.Url, item.Name)}
+                                                    onMouseOver={this.handleAutoPreview.bind(this, item.Url)}
+                                                    onMouseOut={() => {this.setState({timeout_preview: clearTimeout(this.state.timeout_preview)})}}
                                                 />
                                             )}
                         />
@@ -173,6 +185,8 @@ class MainBoard extends React.Component
                                                     primaryText={item.Name}
                                                     value={item.Url}
                                                     onTouchTap={this.handlerAudioSelection.bind(this, item.Url, item.Name)}
+                                                    onMouseOver={this.handleAutoPreview.bind(this, item.Url)}
+                                                    onMouseOut={() => {this.setState({timeout_preview: clearTimeout(this.state.timeout_preview)})}}
                                                 />
                                             )}
                         />
@@ -188,6 +202,8 @@ class MainBoard extends React.Component
                                                     primaryText={item.Name}
                                                     value={item.Url}
                                                     onTouchTap={this.handlerAudioSelection.bind(this, item.Url, item.Name)}
+                                                    onMouseOver={this.handleAutoPreview.bind(this, item.Url)}
+                                                    onMouseOut={() => {this.setState({timeout_preview: clearTimeout(this.state.timeout_preview)})}}
                                                 />
                                             )}
                         />
