@@ -45,9 +45,9 @@ class SignUpForm extends React.Component{
                             floatingLabelText="Password"
                             type="password"
                             name="password"
-                            errorText={errors.email}
+                            errorText={errors.password}
                             onChange={onChange}
-                            value={user.email}
+                            value={user.pasword}
                         />
                     </div>
 

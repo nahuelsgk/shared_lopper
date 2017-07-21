@@ -3,11 +3,12 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 import MenuItem from 'material-ui/MenuItem'
 import AppBar from 'material-ui/AppBar'
 import Drawer from 'material-ui/Drawer'
-import SignUpForm from './components/SignUpForm'
+import SignUpPage from './containers/SignUpPage'
+import LoginPage from './containers/LoginPage'
 import 'rc-slider/assets/index.css';
 import React from 'react';
 import './App.css';
-
+import {browserHistory} from 'react-router';
 import {BrowserRouter as Router, Link, Route} from 'react-router-dom';
 import MainBoard from './components/MainBoard'
 injectTapEventPlugin();
@@ -22,8 +23,8 @@ class App extends React.Component {
 
     render() {
         return (
-            <Router>
-                <MuiThemeProvider>
+            <MuiThemeProvider>
+                <Router>
                     <div className="App">
                         <div>
                             <AppBar
@@ -46,27 +47,25 @@ class App extends React.Component {
                                 <Link to={'/signup'}>
                                     <MenuItem
                                         onTouchTap={e => this.setState({drawerOpen: false})}
+                                        primaryText="Signup"
+                                    />
+                                </Link>
+                                <Link to={'/login'}>
+                                    <MenuItem
+                                        onTouchTap={e => this.setState({drawerOpen: false})}
                                         primaryText="Login"
                                     />
                                 </Link>
                             </Drawer>
                         </div>
                         <Route path="/home" component={MainBoard} />
-                        <Route path="/signup" component={SignUpFormInit} />
+                        <Route path="/signup" component={SignUpPage} />
+                        <Route path="/login" component={LoginPage} />
                     </div>
-                </MuiThemeProvider>
-            </Router>
+                </Router>
+            </MuiThemeProvider>
           );
     }
-}
-
-const SignUpFormInit = () => {
-    return <SignUpForm
-        onSubmit={(e) => console.log('submitted')}
-        onChange={(e) => console.log('changed')}
-        errors={{ email: 'Invalid' }}
-        user={{ email: 'jane@doe.com', name: 'Jane Doe' }}
-    />
 }
 
 export default App;
