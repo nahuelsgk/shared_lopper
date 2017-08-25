@@ -21,9 +21,42 @@ class SignUpPage extends React.Component
     processForm (event)
     {
         event.preventDefault();
-        console.log('name:', this.state.user.name);
-        console.log('email:', this.state.user.email);
-        console.log('password:', this.state.user.password);
+        // console.log('name:', this.state.user.name);
+        // console.log('email:', this.state.user.email);
+        // console.log('password:', this.state.user.password);
+
+        const name = encodeURIComponent(this.state.user.name)
+        const email = encodeURIComponent(this.state.user.email)
+        const password = encodeURIComponent(this.state.user.password)
+
+        var headers = new Headers();
+        headers.append("Accept", "application/json, text/plain, */*");
+        headers.append("Content-Type", "application/json");
+        var payload = {
+            name: name,
+            email: email,
+            password: password
+        };
+
+        fetch(
+            process.env.REACT_APP_PUBLIC_API + "/users/signup",
+            {
+                method: 'POST',
+                headers: headers,
+                mode: 'cors',
+                body: JSON.stringify(payload)
+            })
+            .then(function(response){
+                if (response.ok) {
+                    return response.json()
+                } else {
+                    console.log("Something has happened");
+                }
+            })
+            .then(user => console.log(user))
+            .catch(function (error) {
+                console.log("There has been a problem with fetching: " + error.message)
+            })
     }
 
     changeUser (event) {
