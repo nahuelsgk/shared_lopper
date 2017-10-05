@@ -38,14 +38,24 @@ class App extends React.Component {
                                 onRequestChange={open => this.setState({drawerOpen: open})}
                                 docked={false}
                             >
-                                {Auth.isAuthenticatedUser ? (
-                                    <Link to={'/dashboard'}>
-                                        <MenuItem
-                                            onTouchTap={e => this.setState({drawerOpen: false})}
-                                            value={'/'}
-                                            primaryText="Home"
-                                        />
-                                    </Link>) : (
+                                {
+                                    Auth.isAuthenticatedUser ?
+                                    (
+                                        <div>
+                                            <Link to={'/dashboard'}>
+                                                <MenuItem
+                                                    onTouchTap={e => this.setState({drawerOpen: false})}
+                                                    value={'/'}
+                                                    primaryText="Home"
+                                                />
+                                            </Link>
+                                            <Link to={'/dashboard'}>
+                                                <MenuItem
+                                                    primaryText="Logout"
+                                                />
+                                            </Link>
+                                        </div>
+                                    ) : (
                                         <div>
                                             <Link to={'/signup'}>
                                                 <MenuItem
@@ -54,13 +64,14 @@ class App extends React.Component {
                                                 />
                                             </Link>
                                             <Link to={'/login'}>
-                                            <MenuItem
-                                            onTouchTap={e => this.setState({drawerOpen: false})}
-                                            primaryText="Login"
-                                            />
+                                                <MenuItem
+                                                onTouchTap={e => this.setState({drawerOpen: false})}
+                                                primaryText="Login"
+                                                />
                                             </Link>
                                         </div>
-                                )}
+                                    )
+                                }
                             </Drawer>
                         </div>
                         <Route path="/dashboard" component={MainBoard} />
