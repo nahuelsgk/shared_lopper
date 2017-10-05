@@ -11,6 +11,7 @@ import './App.css';
 import {browserHistory} from 'react-router';
 import {BrowserRouter as Router, Link, Route} from 'react-router-dom';
 import MainBoard from './components/MainBoard'
+import Auth from './modules/Auth'
 injectTapEventPlugin();
 
 class App extends React.Component {
@@ -37,28 +38,32 @@ class App extends React.Component {
                                 onRequestChange={open => this.setState({drawerOpen: open})}
                                 docked={false}
                             >
-                                <Link to={'/home'}>
-                                    <MenuItem
-                                        onTouchTap={e => this.setState({drawerOpen: false})}
-                                        value={'/'}
-                                        primaryText="Home"
-                                    />
-                                </Link>
-                                <Link to={'/signup'}>
-                                    <MenuItem
-                                        onTouchTap={e => this.setState({drawerOpen: false})}
-                                        primaryText="Signup"
-                                    />
-                                </Link>
-                                <Link to={'/login'}>
-                                    <MenuItem
-                                        onTouchTap={e => this.setState({drawerOpen: false})}
-                                        primaryText="Login"
-                                    />
-                                </Link>
+                                {Auth.isAuthenticatedUser ? (
+                                    <Link to={'/dashboard'}>
+                                        <MenuItem
+                                            onTouchTap={e => this.setState({drawerOpen: false})}
+                                            value={'/'}
+                                            primaryText="Home"
+                                        />
+                                    </Link>) : (
+                                        <div>
+                                            <Link to={'/signup'}>
+                                                <MenuItem
+                                                    onTouchTap={e => this.setState({drawerOpen: false})}
+                                                    primaryText="Signup"
+                                                />
+                                            </Link>
+                                            <Link to={'/login'}>
+                                            <MenuItem
+                                            onTouchTap={e => this.setState({drawerOpen: false})}
+                                            primaryText="Login"
+                                            />
+                                            </Link>
+                                        </div>
+                                )}
                             </Drawer>
                         </div>
-                        <Route path="/home" component={MainBoard} />
+                        <Route path="/dashboard" component={MainBoard} />
                         <Route path="/signup" component={SignUpPage} />
                         <Route path="/login" component={LoginPage} />
                     </div>

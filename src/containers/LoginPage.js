@@ -1,5 +1,6 @@
 import React from 'react';
 import LoginForm from '../components/LoginForm';
+import Auth from '../modules/Auth';
 
 class LoginPage extends React.Component
 {
@@ -25,7 +26,7 @@ class LoginPage extends React.Component
         // console.log('password:', this.state.user.password);
 
         const email = encodeURIComponent(this.state.user.email)
-        const password = encodeURIComponent(this.state.password)
+        const password = encodeURIComponent(this.state.user.password)
 
         var headers = new Headers()
         headers.append("Accept", "application/json, text/plain, */*");
@@ -45,7 +46,9 @@ class LoginPage extends React.Component
             })
             .then(function(response){
                 if (response.ok) {
-                    return response.json()
+                    return response.json().then(json => {
+                        Auth.authenticateUser(json.token);
+                    });
                 } else {
                     console.log("Something has happened");
                 }
