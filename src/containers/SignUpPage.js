@@ -1,5 +1,6 @@
 import React from 'react';
 import SignupForm from '../components/SignUpForm';
+import axios from 'axios';
 
 class SignUpPage extends React.Component
 {
@@ -29,34 +30,17 @@ class SignUpPage extends React.Component
         const email = encodeURIComponent(this.state.user.email)
         const password = encodeURIComponent(this.state.user.password)
 
-        var headers = new Headers();
-        headers.append("Accept", "application/json, text/plain, */*");
-        headers.append("Content-Type", "application/json");
         var payload = {
             name: name,
             email: email,
             password: password
         };
 
-        fetch(
-            process.env.REACT_APP_PUBLIC_API + "/users/signup",
-            {
-                method: 'POST',
-                headers: headers,
-                mode: 'cors',
-                body: JSON.stringify(payload)
-            })
-            .then(function(response){
-                if (response.ok) {
-                    return response.json()
-                } else {
-                    console.log("Something has happened");
-                }
-            })
-            .then(user => console.log(user))
-            .catch(function (error) {
-                console.log("There has been a problem with fetching: " + error.message)
-            })
+        axios
+            .post(
+                process.env.REACT_APP_PUBLIC_API + "/users/signup",
+                payload)
+            //.then(response=>{console.log(response)})
     }
 
     changeUser (event) {

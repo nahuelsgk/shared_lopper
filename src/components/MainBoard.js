@@ -5,6 +5,11 @@ import {Grid, Row, Col} from 'react-bootstrap';
 import {List, ListItem} from 'material-ui/List';
 import FileInput from 'react-file-input';
 import keydown from 'react-keydown';
+import axios from 'axios';
+import Auth from './../modules/Auth'
+import mainBoard from '../reducers/index'
+import {previewAudio, cancelPreviewAudio} from "../actions/index";
+import {createStore} from'redux';
 
 const styles = {
     uploadButton: {
@@ -22,6 +27,24 @@ const styles = {
     },
 };
 
+const initComponentMap = () => {
+    var map = new Map();
+    map.set(1, {src: '', name: ''});
+    map.set(2, {src: '', name: ''});
+    map.set(3, {src: '', name: ''});
+    return map;
+}
+
+var initialState = {
+    audio: {
+        timeout: null,
+        selected_pad: null,
+        component_map: initComponentMap()
+    }
+}
+
+let store = createStore(mainBoard, initialState)
+
 @keydown
 class MainBoard extends React.Component
 {
@@ -33,26 +56,20 @@ class MainBoard extends React.Component
             componentPad2: '',
             componentPad3: '',
             selected_audio_file: '',
-            audio_src1: '',
-            file_name_src1: '',
-            audio_src2: '',
-            audio_src3: '',
             kick_audio_files: [],
             snares_audio_files: [],
             hihats_audio_files: [],
-            selected_component: false,
             selected_slot: '',
             component_map: this.initComponentMap(),
             audioDrawerOpen: false,
-            timeout_preview: function() {}
         }
     }
 
     initComponentMap()  {
         var map = new Map();
-        map.set(1, {src: '', name: ''});
-        map.set(2, {src: '', name: ''});
-        map.set(3, {src: '', name: ''});
+        map.set(1, {src: undefined, name: undefined});
+        map.set(2, {src: undefined, name: undefined});
+        map.set(3, {src: undefined, name: undefined});
         return map;
     }
 
@@ -73,27 +90,23 @@ class MainBoard extends React.Component
     }
 
     componentWillMount() {
-        fetch(process.env.REACT_APP_PUBLIC_API + '/api/sounds/808/kicks')
-            .then(response => response.json())
-            .then(
-                items_kicks => {
-                    this.setState({kick_audio_files: items_kicks})
-                }
-            )
-        fetch(process.env.REACT_APP_PUBLIC_API + '/api/sounds/808/snares')
-            .then(response => response.json())
-            .then(
-                items_snares => {
-                    this.setState({snares_audio_files: items_snares})
-                }
-            )
-        fetch(process.env.REACT_APP_PUBLIC_API + '/api/sounds/808/hihats')
-            .then(response => response.json())
-            .then(
-                items_hihats=> {
-                    this.setState({hihats_audio_files: items_hihats})
-                }
-            )
+        let config = {
+            headers: {
+                'Authorization': 'Bearer ' + Auth.getToken()
+            }
+        }
+
+        axios
+            .get(process.env.REACT_APP_PUBLIC_API + '/api/sounds/808/kicks', config)
+            .then(response => { this.setState({kick_audio_files: response.data})})
+
+        axios
+            .get(process.env.REACT_APP_PUBLIC_API + '/api/sounds/808/snares', config)
+            .then(response => {this.setState({snares_audio_files: response.data})})
+
+        axios
+            .get(process.env.REACT_APP_PUBLIC_API + '/api/sounds/808/hihats', config)
+            .then(response=> {this.setState({hihats_audio_files: response.data})})
     }
 
     handlerAudioSelection(url, name) {
@@ -134,15 +147,6 @@ class MainBoard extends React.Component
         }
     }
 
-    handleAutoPreview(url) {
-        var timeout = setTimeout(function () {
-            new Audio(url).play();
-        }, 1000);
-
-        this.setState({timeout_preview: timeout})
-    }
-
-
     render () {
         let audio_kick_files = this.state.kick_audio_files
         let audio_snares_files = this.state.snares_audio_files
@@ -161,51 +165,51 @@ class MainBoard extends React.Component
                             initiallyOpen={false}
                             primaryTogglesNestedList={true}
                             nestedItems={
-                                            audio_kick_files.map(
-                                                item =>
-                                                <ListItem
-                                                    key={item.Name}
-                                                    primaryText={item.Name}
-                                                    value={item.Url}
-                                                    onTouchTap={this.handlerAudioSelection.bind(this, item.Url, item.Name)}
-                                                    onMouseOver={this.handleAutoPreview.bind(this, item.Url)}
-                                                    onMouseOut={() => {this.setState({timeout_preview: clearTimeout(this.state.timeout_preview)})}}
-                                                />
-                                            )}
+                                audio_kick_files.map(
+                                    item =>
+                                        <ListItem
+                                            key={item.Name}
+                                            primaryText={item.Name}
+                                            value={item.Url}
+                                            onTouchTap={this.handlerAudioSelection.bind(this, item.Url, item.Name)}
+                                            onMouseOver={() => store.dispatch(previewAudio(item.Url))}
+                                            onMouseOut={() => store.dispatch(cancelPreviewAudio())}
+                                        />
+                                )}
                         />
                         <ListItem
                             primaryText="Snares"
                             initiallyOpen={false}
                             primaryTogglesNestedList={true}
                             nestedItems={
-                                            audio_snares_files.map(
-                                                item =>
-                                                <ListItem
-                                                    key={item.Name}
-                                                    primaryText={item.Name}
-                                                    value={item.Url}
-                                                    onTouchTap={this.handlerAudioSelection.bind(this, item.Url, item.Name)}
-                                                    onMouseOver={this.handleAutoPreview.bind(this, item.Url)}
-                                                    onMouseOut={() => {this.setState({timeout_preview: clearTimeout(this.state.timeout_preview)})}}
-                                                />
-                                            )}
+                                audio_snares_files.map(
+                                    item =>
+                                        <ListItem
+                                            key={item.Name}
+                                            primaryText={item.Name}
+                                            value={item.Url}
+                                            onTouchTap={this.handlerAudioSelection.bind(this, item.Url, item.Name)}
+                                            onMouseOver={() => store.dispatch(previewAudio(item.Url))}
+                                            onMouseOut={() => store.dispatch(cancelPreviewAudio())}
+                                        />
+                                )}
                         />
                         <ListItem
                             primaryText="Hihats"
                             initiallyOpen={false}
                             primaryTogglesNestedList={true}
                             nestedItems={
-                                            audio_hihats_files.map(
-                                                item =>
-                                                <ListItem
-                                                    key={item.Name}
-                                                    primaryText={item.Name}
-                                                    value={item.Url}
-                                                    onTouchTap={this.handlerAudioSelection.bind(this, item.Url, item.Name)}
-                                                    onMouseOver={this.handleAutoPreview.bind(this, item.Url)}
-                                                    onMouseOut={() => {this.setState({timeout_preview: clearTimeout(this.state.timeout_preview)})}}
-                                                />
-                                            )}
+                                audio_hihats_files.map(
+                                    item =>
+                                        <ListItem
+                                            key={item.Name}
+                                            primaryText={item.Name}
+                                            value={item.Url}
+                                            onTouchTap={this.handlerAudioSelection.bind(this, item.Url, item.Name)}
+                                            onMouseOver={() => store.dispatch(previewAudio(item.Url))}
+                                            onMouseOut={() => store.dispatch(cancelPreviewAudio())}
+                                        />
+                                )}
                         />
                         <FileInput
                             name="My Audio file"
@@ -230,16 +234,15 @@ class MainBoard extends React.Component
                                 style={styles.uploadButton}
                                 containerElement="label"
                                 onTouchTap={
-                                                    e => {
-                                                        this.setState(
-                                                            {
-                                                                audioDrawerOpen: true,
-                                                                selected_component: true,
-                                                                selected_slot: 1,
-                                                            }
-                                                        );
-                                                    }
-                                                 }
+                                    e => {
+                                        this.setState(
+                                            {
+                                                audioDrawerOpen: true,
+                                                selected_slot: 1,
+                                            }
+                                        );
+                                    }
+                                }
                             />
                         </Col>
                         <Col xs={4} md={4}>
@@ -255,16 +258,15 @@ class MainBoard extends React.Component
                                 style={styles.uploadButton}
                                 containerElement="label"
                                 onTouchTap={
-                                                    e => {
-                                                        this.setState(
-                                                            {
-                                                                audioDrawerOpen: true,
-                                                                selected_component: true,
-                                                                selected_slot: 2,
-                                                            }
-                                                        );
-                                                    }
-                                                 }
+                                    e => {
+                                        this.setState(
+                                            {
+                                                audioDrawerOpen: true,
+                                                selected_slot: 2,
+                                            }
+                                        );
+                                    }
+                                }
                             />
                         </Col>
                         <Col xs={4} md={4}>
@@ -280,16 +282,15 @@ class MainBoard extends React.Component
                                 style={styles.uploadButton}
                                 containerElement="label"
                                 onTouchTap={
-                                                    e => {
-                                                        this.setState(
-                                                            {
-                                                                audioDrawerOpen: true,
-                                                                selected_component: true,
-                                                                selected_slot: 3,
-                                                            }
-                                                        );
-                                                    }
-                                                 }
+                                    e => {
+                                        this.setState(
+                                            {
+                                                audioDrawerOpen: true,
+                                                selected_slot: 3,
+                                            }
+                                        );
+                                    }
+                                }
                             />
                         </Col>
                     </Row>

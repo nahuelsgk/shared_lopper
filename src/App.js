@@ -8,10 +8,11 @@ import LoginPage from './containers/LoginPage'
 import 'rc-slider/assets/index.css';
 import React from 'react';
 import './App.css';
-import {browserHistory} from 'react-router';
 import {BrowserRouter as Router, Link, Route} from 'react-router-dom';
 import MainBoard from './components/MainBoard'
 import Auth from './modules/Auth'
+import Logout from './components/Logout'
+
 injectTapEventPlugin();
 
 class App extends React.Component {
@@ -39,7 +40,7 @@ class App extends React.Component {
                                 docked={false}
                             >
                                 {
-                                    Auth.isAuthenticatedUser ?
+                                    Auth.isAuthenticatedUser() ?
                                     (
                                         <div>
                                             <Link to={'/dashboard'}>
@@ -49,8 +50,9 @@ class App extends React.Component {
                                                     primaryText="Home"
                                                 />
                                             </Link>
-                                            <Link to={'/dashboard'}>
+                                            <Link to={'/logout'}>
                                                 <MenuItem
+                                                    onTouchTap={e => this.setState({drawerOpen: false})}
                                                     primaryText="Logout"
                                                 />
                                             </Link>
@@ -77,6 +79,7 @@ class App extends React.Component {
                         <Route path="/dashboard" component={MainBoard} />
                         <Route path="/signup" component={SignUpPage} />
                         <Route path="/login" component={LoginPage} />
+                        <Route path="/logout" component={Logout}/>
                     </div>
                 </Router>
             </MuiThemeProvider>

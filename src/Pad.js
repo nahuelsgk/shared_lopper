@@ -1,57 +1,43 @@
 import React from 'react';
-import Slider from 'rc-slider';
+//import Slider from 'rc-slider';
 import RaisedButton from 'material-ui/RaisedButton';
-//import AudioSelect from './AudioSelector'
+import Slider from 'material-ui/Slider'
+import {soundManager} from 'soundmanager2';
 
 class Pad extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            audio_src: '',
-            audio_component: '',
+            audio_src: undefined,
             key_trigger: props.keyTrigger,
-            volume: 100,
-            file_name: 'None audio selected',
-            kick_audio_files: [],
-            snare_audio_files: [],
+            volume: 75,
+            file_name: undefined,
+            audio: undefined
         }
     }
 
     componentWillReceiveProps(nextProps) {
-        this.setState({audio_src: nextProps.audioSrc, file_name: nextProps.audioFileName})
+        if (this.state.audio_src !== nextProps.audioSrc) {
+            var audio = soundManager.createSound({
+                volume: this.state.volume,
+                file_name: nextProps.audioFileName,
+                url: nextProps.audioSrc
+            });
+            this.setState({audio_src: nextProps.audioSrc, file_name: nextProps.audioFileName, audio: audio})
+        }
     }
 
     componentWillMount() {
-        /*fetch(process.env.REACT_APP_PUBLIC_API + '/api/sounds/808/kicks')
-            .then( response => response.json())
-            .then( items_kicks  => {
-                this.setState({kick_audio_files: items_kicks})
-            });
-
-        fetch(process.env.REACT_APP_PUBLIC_API + '/api/sounds/808/snares')
-            .then( response => response.json())
-            .then( items => {
-                this.setState({snare_audio_files: items})
-            });
-
-        fetch(process.env.REACT_APP_PUBLIC_API + '/api/sounds/808/hihats')
-            .then( response => response.json())
-            .then( items => {
-                this.setState({hihats_audio_files: items})
-            });*/
+        soundManager.setup({debugMode: false})
     }
 
     play () {
-        if (this.state.audio_src) {
-            if (this.audio_component.paused || this.audio_component.ended || this.audio_component.currentTime === 0 ) {
-                this.audio_component.play()
-                    .then(function(){
-                    })
-                    .catch(function(error) {
-                        console.log(error)
-                    })
+        if (this.state.audio !== undefined) {
+            console.log(this.state.audio.playState);
+            if (this.state.audio.playState === 0 ) {
+                this.state.audio.play()
             } else {
-                this.audio_component.currentTime = 0;
+                this.state.audio.setPosition(0);
             }
         }
     }
@@ -72,8 +58,12 @@ class Pad extends React.Component {
         }
     }
 
-    updateVolume( props ) {
-        this.audio_component.volume = props / 100
+    updateVolume( event, props ) {
+        if (this.state.audio !== undefined) {
+            var new_audio = this.state.audio;
+            new_audio.setVolume(props)
+            this.setState({audio: new_audio});
+        }
     }
 
     updateAudioSelect(object, value) {
@@ -94,34 +84,20 @@ class Pad extends React.Component {
                     />
                 </div>
                 <div>
-                    <audio
-                        ref={component => this.audio_component = component}
-                        src={this.state.audio_src}
+                    <RaisedButton
+                        style={{width: '7em', height: '7em'}}
+                        label={this.state.key_trigger}
+                        onTouchTap={this.play.bind(this)}
                     />
-                    <RaisedButton label={this.state.key_trigger} onTouchTap={this.play.bind(this)}/>
                 </div>
                 <div>
-                    <Slider min={0} max={100} defaultValue={75} onChange={this.updateVolume.bind(this)}/>
-                </div>
-                <div>
-                    {/* KICKS */}
-                    {/*<AudioSelect
-                        label="KICKS"
-                        audiofiles={kick_audio_files}
-                        onSelectHandler={this.updateAudioSelect.bind(this)}
-                    />*/}
-                    {/* SNARES */}
-                    {/*<AudioSelect
-                        label="SNARES"
-                        audiofiles={snares_audio_files}
-                        onSelectHandler={this.updateAudioSelect.bind(this)}
-                    />*/}
-                    {/* HIHATS */}
-                    {/*<AudioSelect
-                        label="HIHATS"
-                        audiofiles={hihat_audio_files}
-                        onSelectHandler={this.updateAudioSelect.bind(this)}
-                    />*/}
+                    <Slider
+                        style={{width: '7em', margin: '0 auto'}}
+                        min={0}
+                        max={100}
+                        defaultValue={75}
+                        onChange={this.updateVolume.bind(this)}
+                    />
                 </div>
             </div>
         )
@@ -129,7 +105,7 @@ class Pad extends React.Component {
 }
 
 const AudioNameDisplay = (props) => {
-    if (props.fileName !== '') {
+    if (props.fileName !== undefined) {
         return <span>{props.fileName}</span>
     } else {
         return <span>No audio selected</span>
